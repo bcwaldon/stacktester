@@ -1,4 +1,5 @@
 
+import base64
 import json
 import time
 
@@ -155,6 +156,7 @@ class ServerActionsTest(unittest.TestCase):
         # Make rebuild request
         post_body = json.dumps({
             'rebuild': {
+                'name': 'stacktester2',
                 'imageRef': self.image_ref_alt,
                 'metadata': {'1234': '5678'},
                 'personality': [
@@ -167,6 +169,7 @@ class ServerActionsTest(unittest.TestCase):
         self.assertEqual('202', response['status'])
         rebuilt_server = json.loads(body)['server']
         generated_password = rebuilt_server['adminPass']
+        self.assertTrue('personality' not in rebuilt_server)
 
         # Ensure correct status transition
         # KNOWN-ISSUE
@@ -181,7 +184,12 @@ class ServerActionsTest(unittest.TestCase):
         self.assertTrue(ref_match or id_match)
 
         # Metadata should be overwritten
+        self.assertEqual({'1234': '5678'}, rebuilt_server['metadata'])
         self.assertEqual({'1234': '5678'}, server['metadata'])
+
+        # Name should change
+        self.assertEqual('stacktester2', rebuilt_server['name'])
+        self.assertEqual('stacktester2', server['name'])
 
         # SSH into the server to ensure it came back up
         self._assert_ssh_password(generated_password)
@@ -220,7 +228,12 @@ class ServerActionsTest(unittest.TestCase):
         self.assertTrue(ref_match or id_match)
 
         # Metadata should not change
+        self.assertEqual({'1234': '5678'}, rebuilt_server['metadata'])
         self.assertEqual({'1234': '5678'}, server['metadata'])
+
+        # Name should not change
+        self.assertEqual('stacktester2', rebuilt_server['name'])
+        self.assertEqual('stacktester2', server['name'])
 
         # SSH into the server to ensure it came back up
         self._assert_ssh_password(specified_password)
