@@ -160,7 +160,7 @@ class ServerActionsTest(unittest.TestCase):
                 'imageRef': self.image_ref_alt,
                 'metadata': {'1234': '5678'},
                 'personality': [
-                    {'path': '/tmp/asdf', 'contents': base64.encode('XXX')},
+                    {'path': '/tmp/asdf', 'contents': base64.b64encode('XXX')},
                 ],
             },
         })
