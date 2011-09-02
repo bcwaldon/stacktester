@@ -39,9 +39,6 @@ class ServerActionsTest(unittest.TestCase):
         self._wait_for_server_status(self.server_id, 'ACTIVE')
 
         server = self.os.nova.get_server(self.server_id)
-
-        # KNOWN-ISSUE lp?
-        #self.access_ip = server['accessIPv4']
         self.access_ip = server['addresses']['public'][0]['addr']
 
         # Ensure server came up
@@ -98,10 +95,7 @@ class ServerActionsTest(unittest.TestCase):
         self.assertEqual(response['status'], '202')
 
         # Assert status transition
-        # KNOWN-ISSUE
-        #self._wait_for_server_status(self.server_id, 'REBOOT')
-        ssh_client = self._get_ssh_client(self.server_password)
-        ssh_client.connect_until_closed()
+        self._wait_for_server_status(self.server_id, 'REBOOT')
         self._wait_for_server_status(self.server_id, 'ACTIVE')
 
         # SSH and verify uptime is less than before
@@ -144,8 +138,7 @@ class ServerActionsTest(unittest.TestCase):
 
         # Assert status transition
         self.assertEqual('202', response['status'])
-        # KNOWN-ISSUE
-        #self._wait_for_server_status(self.server_id, 'PASSWORD')
+        self._wait_for_server_status(self.server_id, 'PASSWORD')
         self._wait_for_server_status(self.server_id, 'ACTIVE')
 
         # SSH into server using new password
@@ -172,9 +165,7 @@ class ServerActionsTest(unittest.TestCase):
         generated_password = rebuilt_server['adminPass']
 
         # Ensure correct status transition
-        # KNOWN-ISSUE
-        #self._wait_for_server_status(self.server_id, 'REBUILD')
-        self._wait_for_server_status(self.server_id, 'BUILD')
+        self._wait_for_server_status(self.server_id, 'REBUILD')
         self._wait_for_server_status(self.server_id, 'ACTIVE')
 
         # Treats an issue where we ssh'd in too soon after rebuild
@@ -215,9 +206,7 @@ class ServerActionsTest(unittest.TestCase):
         self.assertEqual(rebuilt_server['adminPass'], specified_password)
 
         # Ensure correct status transition
-        # KNOWN-ISSUE
-        #self._wait_for_server_status(self.server_id, 'REBUILD')
-        self._wait_for_server_status(self.server_id, 'BUILD')
+        self._wait_for_server_status(self.server_id, 'REBUILD')
         self._wait_for_server_status(self.server_id, 'ACTIVE')
 
         # Treats an issue where we ssh'd in too soon after rebuild
@@ -245,9 +234,7 @@ class ServerActionsTest(unittest.TestCase):
 
         # Wait for status transition
         self.assertEqual('202', response['status'])
-        # KNOWN-ISSUE
-        #self._wait_for_server_status(self.server_id, 'VERIFY_RESIZE')
-        self._wait_for_server_status(self.server_id, 'RESIZE-CONFIRM')
+        self._wait_for_server_status(self.server_id, 'VERIFY_RESIZE')
 
         # Ensure API reports new flavor
         server = self.os.nova.get_server(self.server_id)
@@ -280,9 +267,7 @@ class ServerActionsTest(unittest.TestCase):
 
         # Wait for status transition
         self.assertEqual('202', response['status'])
-        # KNOWN-ISSUE
-        #self._wait_for_server_status(self.server_id, 'VERIFY_RESIZE')
-        self._wait_for_server_status(self.server_id, 'RESIZE-CONFIRM')
+        self._wait_for_server_status(self.server_id, 'VERIFY_RESIZE')
 
         # SSH into the server to ensure it came back up
         self._assert_ssh_password()
